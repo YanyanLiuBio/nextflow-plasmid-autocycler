@@ -14,9 +14,10 @@ set -e
 
 # Get arguments.
 reads=$1                 # input reads FASTQ
-threads=$2               # threads per job
-jobs=$3                  # number of simultaneous jobs
-read_type=${4:-ont_r10}  # read type (default = ont_r10)
+length=$2
+threads=$3               # threads per job
+jobs=$4                  # number of simultaneous jobs
+read_type=${5:-ont_r10}  # read type (default = ont_r10)
 
 # Input assembly jobs that exceed this time limit will be killed
 max_time="8h"
@@ -38,7 +39,7 @@ esac
 
 #genome_size=$(autocycler helper genome_size --reads "$reads" --threads "$threads")
 
-genome_size=4000
+genome_size=$length
 
 # Step 1: subsample the long-read set into multiple files
 autocycler subsample \
@@ -64,8 +65,14 @@ set +e
 nice -n 19 parallel --jobs "$jobs" \
 --joblog assemblies/joblog.tsv \
 --results assemblies/logs \
---timeout "$max_time" < assemblies/jobs.txt
+--timeout "$max_time" \
+--halt never < assemblies/jobs.txt
+exit_code=$?
 set -e
+
+if [ $exit_code -ne 0 ]; then
+    echo "Warning: Some assembly jobs failed. Check assemblies/joblog.tsv for details." 1>&2
+fi
 
 # Give circular contigs from Plassembler extra clustering weight
 shopt -s nullglob
