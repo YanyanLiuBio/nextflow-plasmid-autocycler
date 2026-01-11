@@ -17,7 +17,7 @@ workflow {
         .fromPath(params.meta)          // e.g. params.meta = "samples.csv"
         .splitCsv(header: true)
         .map { row ->
-            tuple(row.sample_id, row.length as Integer)
+            tuple(row.sample_id, (row.length as Double).intValue())
         }
 
     merged_ch = reads_ch
