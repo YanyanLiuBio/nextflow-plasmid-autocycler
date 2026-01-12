@@ -1,6 +1,6 @@
 process AUTOCYCLER {
     tag "${pair_id}"
-    
+    errorStrategy 'ignore'
     publishDir "output", mode: 'copy', pattern: "${pair_id}*"
    
 
