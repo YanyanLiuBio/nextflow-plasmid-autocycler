@@ -2,6 +2,5 @@ work/
 .nextflow/
 .nextflow*
 output/
-test_data/fastq/
 docker2/
 info/
